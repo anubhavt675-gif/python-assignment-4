@@ -7,9 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # -------------------------
-# Config / filenames
+
 # -------------------------
-INPUT_CSV = "wheather_data.csv.csv"   # agar alag naam ho toh yahan change karo
+INPUT_CSV = "wheather_data.csv.csv"  
 CLEANED_CSV = "cleaned_weather.csv"
 OUTPUT_DIR = "weather_outputs"
 SUMMARY_FILE = os.path.join(OUTPUT_DIR, "summary_report.txt")
@@ -36,7 +36,7 @@ def detect_date_column(df):
     candidates = [c for c in df.columns if 'date' in c.lower() or 'time' in c.lower()]
     if candidates:
         return candidates[0]
-    # fallback: first column if it looks like date
+
     first = df.columns[0]
     sample = df[first].astype(str).iloc[:5].str.replace('-', '').str.replace('/', '')
     if sample.str.isnumeric().any():
@@ -46,7 +46,7 @@ def detect_date_column(df):
 def parse_dates(df, date_col):
     """Convert date column to datetime, create day/month/year columns."""
     df[date_col] = pd.to_datetime(df[date_col], errors='coerce', dayfirst=True)
-    # drop rows where date couldn't be parsed
+    
     df = df.dropna(subset=[date_col]).copy()
     df['year'] = df[date_col].dt.year
     df['month'] = df[date_col].dt.month
@@ -57,11 +57,11 @@ def parse_dates(df, date_col):
 def basic_cleaning(df):
     """Lowercase column names, strip spaces, convert numeric-like cols to numeric."""
     df.columns = [c.strip().lower().replace(' ', '_') for c in df.columns]
-    # convert numeric columns forcibly
+    
     for c in df.columns:
-        # skip index-like or object columns with many unique strings
+        
         if df[c].dtype == object:
-            # try to coerce numbers
+        
             coerced = pd.to_numeric(df[c].str.replace('[^\d\.\-]', '', regex=True), errors='coerce')
             # if lots of numeric present, replace
             if coerced.notna().sum() > len(df) * 0.1:
@@ -201,8 +201,8 @@ def main():
     else:
         print("Temperature or humidity column missing — skipping scatter plot.")
 
-    # (D) Combined figure: temperature + rainfall monthly (two plots side-by-side)
-    # We'll create monthly mean temperature and monthly rainfall total if available
+
+
     combined_created = False
     try:
         monthly_mean_temp = df[temp_col].resample('M').mean() if temp_col in df.columns else None
@@ -231,7 +231,7 @@ def main():
     if not combined_created:
         print("Combined monthly plot skipped (missing temp or rainfall).")
 
-    # 9. Grouping & aggregation: monthly statistics table
+    
     agg_table = None
     try:
         agg_table = df.resample('M').agg({
@@ -278,3 +278,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
